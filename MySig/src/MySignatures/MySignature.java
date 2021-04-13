@@ -6,6 +6,7 @@ package MySignatures;
  * SHA256withRSA
  * SHA512withRSA
  * 
+ * @author Sergio Gustavo Mendonça Pyrrho Moreira e Alex Nascimento Rodrigues
  */
 
 
@@ -24,14 +25,40 @@ public class MySignature {
 	private byte[] decryptMessageDigest;
 	
 	
-	protected MySignature (String algorithm, String sign ) throws Exception {
+	protected MySignature (String algorithm) throws NoSuchPaddingException, NoSuchAlgorithmException {
 		String[] algorithms = algorithm.toLowerCase().split("with");
 		
+		String dgstAlg = algorithms[0];
+		
+		if(dgstAlg.equals("sha256")) {
+			dgstAlg = "sha256"; 
+		}
+		else if(dgstAlg.equals("sha512")) {
+			dgstAlg = "sha512";
+		}
+		else {
+			System.out.println("Padrão de Assinatura Não Reconhecido.\n");
+		}
+		
+		this.message_digest = MessageDigest.getInstance(dgstAlg);
+		this.cipher = Cipher.getInstance(algorithms[1]);
 		
 	}
 	
-	public static MySignature GetInstance(String algorithm, String sign) throws Exception {
-		MySignature mysignature = new MySignature(algorithm, sign);
+	public static MySignature getInstance(String algorithm) throws NoSuchAlgorithmException, NoSuchPaddingException {
+		MySignature mysignature;
+		String lowAlg = algorithm.toLowerCase();
+		if(lowAlg.equals("md5withrsa") || lowAlg.equals("sha1withrsa") || lowAlg.equals("sha1withrsa") || lowAlg.equals("sha256withrsa") || lowAlg.equals("sha512withrsa")) {
+			try {
+				mysignature = new MySignature(algorithm);
+			}
+			catch (NoSuchAlgorithmException | NoSuchPaddingException e){
+				throw new NoSuchAlgorithmException("Implementação Não Disponível Para Algoritmo.\n");
+			}
+		}
+		else {
+			throw new NoSuchAlgorithmException("Assinatura Não Suporta Algoritmo.\n");
+		}
 		
 		return mysignature;
 	}
