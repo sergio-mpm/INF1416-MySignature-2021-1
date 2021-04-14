@@ -66,14 +66,14 @@ public class MySignature {
 		return mysignature;
 	}
 	
-	private void generatePairOfKey(PrivateKey newPrivateKey, PublicKey newPublicKey) throws Exception {
+	public void generatePairOfKey(PrivateKey newPrivateKey, PublicKey newPublicKey) throws Exception {
 		System.out.println("Gerando chave RSA");
 		this.setPrivateKey(newPrivateKey);
 		this.setPublicKey(newPublicKey);
 	}
 	
-	public void initSign() throws InvalidKeyException {
-		this.cipher.init(Cipher.ENCRYPT_MODE, this.getPrivateKey());
+	public void initSign(PrivateKey newPrivateKey) throws InvalidKeyException {
+		this.cipher.init(Cipher.ENCRYPT_MODE, newPrivateKey);
 		this.signatureState = true;
 		System.out.println("Assinatura Com Chave Privada Gerada.\n");
 	}
@@ -108,7 +108,7 @@ public class MySignature {
 		System.out.println("Verificação do Cipher em andamento.\n");
 	}
 	
-public boolean verify(byte[] assinatura) throws Exception {
+	public boolean verify(byte[] assinatura) throws Exception {
 				
 		byte[] tc1 = message_digest.digest();
 		byte[] digestFromSign = cipher.doFinal(assinatura);
@@ -120,42 +120,34 @@ public boolean verify(byte[] assinatura) throws Exception {
 		}
 
 		if (Arrays.equals(tc1, digestFromSign)) {
-			return true; // Valido
+			return true; //Valido
 		}		
 		
-		return false; // Invalido
+		return false; //Invalido
 		
 	}
-	
-	private void setKeyPar(KeyPair newKeyPair) {
-		this.key = newKeyPair;
-	}
-	
-	private KeyPair getKeyPair() {
-		return this.key;	
-	}
-	
-	private void setPublicKey(PublicKey newPublicKey) {
+
+	public void setPublicKey(PublicKey newPublicKey) {
 		this.publiKey = newPublicKey;
 	}
 	
-	private PublicKey getPublicKey() {
+	public PublicKey getPublicKey() {
 		return this.publiKey;
 	}
 	
-	private void setPrivateKey(PrivateKey newPrivateKey) {
+	public void setPrivateKey(PrivateKey newPrivateKey) {
 		this.privKey = newPrivateKey;
 	}
 	
-	private PrivateKey getPrivateKey() {
+	public PrivateKey getPrivateKey() {
 		return this.privKey;
 	}
 	
-	private void setDecryptMessageDigest(byte[] newDecryptMessageDigest) {
+	public void setDecryptMessageDigest(byte[] newDecryptMessageDigest) {
 		this.decryptMessageDigest = newDecryptMessageDigest;
 	}
 	
-	private byte[] getDecryptMessageDigest() {
+	public byte[] getDecryptMessageDigest() {
 		return this.decryptMessageDigest;
 	}
 }
