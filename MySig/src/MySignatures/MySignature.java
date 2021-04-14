@@ -18,27 +18,26 @@ public class MySignature {
 	
 	private MessageDigest message_digest;
 	private Cipher cipher;
-	private PublicKey publiKey;
-	private PrivateKey privKey;
 	private boolean signatureState;
 	private byte[] decryptMessageDigest;
 	
 	
 	protected MySignature (String algorithm) throws NoSuchPaddingException, NoSuchAlgorithmException {
-		String[] algorithms = algorithm.toLowerCase().split("with");
+		
+		
+		String[] algorithms = algorithm.toUpperCase().split("WITH");
 		
 		String dgstAlg = algorithms[0];
 		
-		if(dgstAlg.equals("sha256")) {
-			dgstAlg = "sha256"; 
+		System.out.println("\nTESTE dgstAlg: " + dgstAlg);
+				
+		if(dgstAlg.equals("SHA256")) {
+			dgstAlg = "SHA-256"; 
 		}
-		else if(dgstAlg.equals("sha512")) {
-			dgstAlg = "sha512";
-		}
-		else {
-			System.out.println("Padrão de Assinatura Não Reconhecido.\n");
-		}
-		
+		else if(dgstAlg.equals("SHA512")) {
+			dgstAlg = "SHA-512";
+		}		
+				
 		this.message_digest = MessageDigest.getInstance(dgstAlg);
 		this.decryptMessageDigest = null;
 		this.cipher = Cipher.getInstance(algorithms[1]);
@@ -49,7 +48,7 @@ public class MySignature {
 	public static MySignature getInstance(String algorithm) throws NoSuchAlgorithmException, NoSuchPaddingException {
 		MySignature mysignature;
 		String lowAlg = algorithm.toLowerCase();
-		if(lowAlg.equals("md5withrsa") || lowAlg.equals("sha1withrsa") || lowAlg.equals("sha1withrsa") || lowAlg.equals("sha256withrsa") || lowAlg.equals("sha512withrsa")) {
+		if(lowAlg.equals("md5withrsa") || lowAlg.equals("sha1withrsa") || lowAlg.equals("sha256withrsa") || lowAlg.equals("sha512withrsa")) {
 			try {
 				mysignature = new MySignature(algorithm);
 			}
@@ -62,12 +61,6 @@ public class MySignature {
 		}
 		
 		return mysignature;
-	}
-	
-	public void generatePairOfKey(PrivateKey newPrivateKey, PublicKey newPublicKey) throws Exception {
-		System.out.println("Gerando chave RSA");
-		this.setPrivateKey(newPrivateKey);
-		this.setPublicKey(newPublicKey);
 	}
 	
 	public void initSign(PrivateKey newPrivateKey) throws InvalidKeyException {
@@ -95,17 +88,16 @@ public class MySignature {
 				cipherDigest = this.cipher.doFinal(this.decryptMessageDigest);
 			}
 			catch (Exception e) {
-				throw new SignatureException("Algoritmo de assinatura não consegue processar os dados.\n");
+				throw new SignatureException("Erro durante a assinatura.\n");
 			}
 		}
 		System.out.println("Assinatura Concluída - [Chave Privada]\n");
 		return cipherDigest;
 	}
 	
-	public void initVerify() throws Exception {
-		System.out.println("Inicializando Verificação do Cipher.\n");
-		this.cipher.init(Cipher.DECRYPT_MODE, this.getPublicKey());
-		System.out.println("Verificação do Cipher em andamento.\n");
+	public void initVerify(PublicKey pbKey) throws Exception {
+		System.out.println("Verificação do cipher.\n");
+		cipher.init(Cipher.DECRYPT_MODE, pbKey);
 	}
 	
 	public boolean verify(byte[] assinatura) throws Exception {
@@ -113,7 +105,7 @@ public class MySignature {
 		byte[] tc1 = message_digest.digest();
 		byte[] digestFromSign = cipher.doFinal(assinatura);
 		
-		System.out.println("\nDigest gerado:");
+		System.out.println("\nResultado do Digest:");
 		
 		for (int i=0; i != tc1.length; i++) {
 			System.out.println(String.format("%02X", tc1[i]));
@@ -127,27 +119,7 @@ public class MySignature {
 		
 	}
 
-	public void setPublicKey(PublicKey newPublicKey) {
-		this.publiKey = newPublicKey;
-	}
-	
-	public PublicKey getPublicKey() {
-		return this.publiKey;
-	}
-	
-	public void setPrivateKey(PrivateKey newPrivateKey) {
-		this.privKey = newPrivateKey;
-	}
-	
-	public PrivateKey getPrivateKey() {
-		return this.privKey;
-	}
-	
-	public void setDecryptMessageDigest(byte[] newDecryptMessageDigest) {
-		this.decryptMessageDigest = newDecryptMessageDigest;
-	}
-	
-	public byte[] getDecryptMessageDigest() {
-		return this.decryptMessageDigest;
-	}
+
+
+
 }

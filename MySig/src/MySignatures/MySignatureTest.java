@@ -9,31 +9,31 @@ public class MySignatureTest {
 	public MySignatureTest(String[] args) throws Exception {
 			
 			if(args.length != 1) {
-				System.err.println("Usage: TrabLab001 \"text\"");
+				System.err.println("Excesso de argumentos!");
 				System.exit(1);
 			}
-			System.out.println("plainText: " + args[0]);
+			System.out.println("Padrao de Assinatura: " + args[0]);
 	
-			byte[] plainText = args[0].getBytes("UTF8");
-			System.out.print("plainText Hexa: ");
-			for(int i = 0; i < plainText.length; i++)
-				System.out.print(String.format("%02X", plainText[i]));
+			byte[] padraoAsgn = args[0].getBytes("UTF8"); 
+			System.out.print("Padrao de Assinatura em Hexadecimal: ");
+			for(int i = 0; i < padraoAsgn.length; i++)
+				System.out.print(String.format("%02X", padraoAsgn[i]));
 			
 			KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
 			keyGen.initialize(1024);
 			KeyPair key = keyGen.generateKeyPair();
 			
-			MySignature mySignature = MySignature.getInstance("MD5withRSA");
+			MySignature mySignature = MySignature.getInstance("SHA512withRSA");
 			mySignature.initSign(key.getPrivate());
-			mySignature.update(plainText);
+			mySignature.update(padraoAsgn);
 	
 			byte[] signature = mySignature.sign();
 			System.out.print("\nSignature: ");
 			for(int i = 0; i != signature.length; i++)
 				System.out.print(String.format("%02x", signature[i]));
 						
-			mySignature.initVerify();
-			mySignature.update(plainText);
+			mySignature.initVerify(key.getPublic());
+			mySignature.update(padraoAsgn);
 			
 			if(mySignature.verify(signature))
 				System.out.println("\nAssinatura válida");
