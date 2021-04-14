@@ -151,7 +151,3 @@ public class MySignature {
 		return this.decryptMessageDigest;
 	}
 }
-
-
-
-

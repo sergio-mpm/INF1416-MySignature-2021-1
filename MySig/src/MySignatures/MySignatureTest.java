@@ -6,7 +6,7 @@ import java.security.KeyPairGenerator;
 
 
 public class MySignatureTest {
-	public static void main(String[] args) throws Exception {
+	public MySignatureTest(String[] args) throws Exception {
 			
 			if(args.length != 1) {
 				System.err.println("Usage: TrabLab001 \"text\"");
