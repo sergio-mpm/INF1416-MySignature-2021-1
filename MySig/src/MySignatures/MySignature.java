@@ -29,8 +29,6 @@ public class MySignature {
 		
 		String dgstAlg = algorithms[0];
 		
-		System.out.println("\nTESTE dgstAlg: " + dgstAlg);
-				
 		if(dgstAlg.equals("SHA256")) {
 			dgstAlg = "SHA-256"; 
 		}
