@@ -92,23 +92,23 @@ public class MySignature {
 		System.out.println("Verificação do Cipher em andamento.\n");
 	}
 	
-	public boolean verify() throws Exception {
-		this.setDecryptMessageDigest(cipher.doFinal(this.getCipherText()));
+	public boolean verify(byte[] assinatura) throws Exception {
 		
-		StringBuffer buff = new StringBuffer();
+		byte[] tc1 = message_digest.digest();
 		
-		for(int idx = 0; idx < this.getDecryptMessageDigest().length, idx++) {
-			String hex = Integer.toHexString(0x1000 + (this.getDecryptMessageDigest()[i] & 0x00FF)).substring(1);
-			buff.append((hex.length() < 2 ? "0" : " ") + hex);
+		byte[] digestFromSign = cipher.doFinal(assinatura);
+		
+		System.out.println("\nDigest gerado:");
+		
+		for (int i=0; i != tc1.length; i++) {
+			System.out.println(String.format("%02X", tc1[i]));
 		}
 		
-		String decryptMessageDigest = buff.toString();
+		if (Arrays.equals(tc1, digestFromSign)) {
+			return true; // Válido
+		}		
 		
-		System.out.println("Message Digest: " + this.message_digest.getHexDigest());
-		System.out.println("Message Digest Decriptado: " + decryptMessageDigest());
-		System.out.println("Finalizada Verificação do Cipher.\n");
-		
-		return Arrays.equals(this.message_digest.getDigest(), this.getDecryptMessageDigest());
+		return false; // Inválido
 		
 	}
 	
