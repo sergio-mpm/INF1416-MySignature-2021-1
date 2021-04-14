@@ -22,6 +22,7 @@ public class MySignature {
 	private KeyPair key;
 	private PublicKey publiKey;
 	private PrivateKey privKey;
+	private boolean signatureState;
 	private byte[] decryptMessageDigest;
 	
 	
@@ -41,7 +42,9 @@ public class MySignature {
 		}
 		
 		this.message_digest = MessageDigest.getInstance(dgstAlg);
+		this.decryptMessageDigest = null;
 		this.cipher = Cipher.getInstance(algorithms[1]);
+		this.signatureState = false;
 		
 	}
 	
@@ -63,26 +66,39 @@ public class MySignature {
 		return mysignature;
 	}
 	
-	private void generatePairOfKey() throws Exception {
+	private void generatePairOfKey(PrivateKey newPrivateKey, PublicKey newPublicKey) throws Exception {
 		System.out.println("Gerando chave RSA");
+		this.setPrivateKey(newPrivateKey);
+		this.setPublicKey(newPublicKey);
 	}
 	
-	public void initSign() throws Exception {
-		System.out.println("Gerando Par de Chave .\n");
-		this.generatePairOfKey();
-		this.cipher = Cipher.getInstance("RSA/ECB/PKCBS1Padding");
+	public void initSign() throws InvalidKeyException {
 		this.cipher.init(Cipher.ENCRYPT_MODE, this.getPrivateKey());
-		System.out.println("Par de Chave gerada.\n");
+		this.signatureState = true;
+		System.out.println("Assinatura Com Chave Privada Gerada.\n");
 	}
 	
-	public void update() throws Exception {
-		System.out.println("Elaborando MDigest.\n");
-		this.message_digest.generateMessageDigest();
+	public void update(byte[] data) throws SignatureException {
+		if (this.signatureState == true) {
+			this.message_digest.update(data);
+		}
+		else {
+			System.out.println("Erro ao atualizar.\n");
+			throw new SignatureException("Erro ao atualizar assinatura.\n");
+		}
 	}
 	
-	public void sign() throws Exception {
+	public void sign() throws SignatureException {
 		System.out.println("Assinando MDigest - [Chave Privada]\n");
-		this.setCipherText(cipher.doFinal(this.message_digest.getDigest()));
+		if(this.signatureState == true) {
+			this.decryptMessageDigest = message_digest.digest();
+			try {
+				this.cipher.doFinal(this.decryptMessageDigest);
+			}
+			catch (Exception e) {
+				throw new SignatureException("Algoritmo de assinatura não consegue processar os dados.\n");
+			}
+		}
 		System.out.println("Assinatura Concluída - [Chave Privada]\n");
 	}
 	
@@ -92,7 +108,7 @@ public class MySignature {
 		System.out.println("Verificação do Cipher em andamento.\n");
 	}
 	
-	public boolean verify() throws Exception {
+	public boolean verify(byte[] signature) throws Exception {
 		this.setDecryptMessageDigest(cipher.doFinal(this.getCipherText()));
 		
 		StringBuffer buff = new StringBuffer();
@@ -134,14 +150,6 @@ public class MySignature {
 	
 	private PrivateKey getPrivateKey() {
 		return this.privKey;
-	}
-	
-	private void setMessage(byte[] msg) {
-		this.message_digest.setMessage(msg);
-	}
-	
-	private byte[] getMessage() {
-		return this.message_digest.getMessage();
 	}
 	
 	private void setDecryptMessageDigest(byte[] newDecryptMessageDigest) {
