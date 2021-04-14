@@ -18,8 +18,6 @@ public class MySignature {
 	
 	private MessageDigest message_digest;
 	private Cipher cipher;
-	private KeyPairGenerator KGen;
-	private KeyPair key;
 	private PublicKey publiKey;
 	private PrivateKey privKey;
 	private boolean signatureState;
@@ -88,18 +86,20 @@ public class MySignature {
 		}
 	}
 	
-	public void sign() throws SignatureException {
+	public byte[] sign() throws SignatureException {
 		System.out.println("Assinando MDigest - [Chave Privada]\n");
+		byte[] cipherDigest = null;
 		if(this.signatureState == true) {
 			this.decryptMessageDigest = message_digest.digest();
 			try {
-				this.cipher.doFinal(this.decryptMessageDigest);
+				cipherDigest = this.cipher.doFinal(this.decryptMessageDigest);
 			}
 			catch (Exception e) {
 				throw new SignatureException("Algoritmo de assinatura não consegue processar os dados.\n");
 			}
 		}
 		System.out.println("Assinatura Concluída - [Chave Privada]\n");
+		return cipherDigest;
 	}
 	
 	public void initVerify() throws Exception {
